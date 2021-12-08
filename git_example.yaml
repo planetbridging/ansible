@@ -1,0 +1,9 @@
+---
+- hosts: localhost
+  become: true
+
+  tasks:
+      - name: pull from git
+        ansible.builtin.git:
+          repo: https://github.com/planetbridging/lucy.git
+          dest: ./lucy

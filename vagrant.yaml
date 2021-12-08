@@ -1,0 +1,19 @@
+---
+- hosts: localhost
+  become: true
+  pre_tasks:
+      - name: Setup vagrant
+        apt:
+          name: [
+          vagrant
+          ]
+          update_cache: yes
+        retries: 3
+
+  tasks:
+      - name: Get ubuntu xenial64
+        raw: vagrant box add ubuntu/xenial64
+        ignore_errors: yes 
+
+      - name: Setup 3 virtualboxs
+        raw: vagrant up

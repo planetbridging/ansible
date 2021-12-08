@@ -1,0 +1,22 @@
+---
+- hosts: localhost
+  become: true
+  pre_tasks:
+    - name: Setting Ansible VMware
+      apt:
+        name: [
+        python3-dev,
+        python3-pip
+        ]
+        update_cache: yes
+      retries: 3
+
+    - name: pip pyvmomi
+      pip:
+        name: pyvmomi
+        executable: pip3
+
+    - name: pip install vSphere Automation Python SDK
+      pip:
+        name: git+https://github.com/vmware/vsphere-automation-sdk-python.git
+        executable: pip3

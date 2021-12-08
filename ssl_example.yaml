@@ -1,0 +1,42 @@
+---
+- hosts: localhost
+  become: true
+  vars:
+    - server_hostname: example.com
+    - key_size: 4096
+    - passphrase: # Set if you want passphrase
+    - key_type: DSA # Others include DSA, ECC, Ed25519, Ed448, X25519, X448
+    - country_name: AU
+    - organization_name: globalx
+    - email_address: shannon.setter@globalx.com.au
+  pre_tasks:
+    - name: Creates directory
+      file:
+        path: ./certificates
+        state: directory
+  
+  tasks:
+
+      - name: Generate an OpenSSL private key
+        openssl_privatekey:
+          path: "./certificates/{{ server_hostname }}_privkey.pem"
+          size: "{{ key_size }}"
+          type: "{{ key_type }}"
+          backup: yes
+
+      - name: Generate an OpenSSL Certificate Signing Request with Subject information
+        openssl_csr:
+          path: "./certificates/{{ server_hostname }}.csr"
+          privatekey_path: "./certificates/{{ server_hostname }}_privkey.pem"
+          country_name: "{{ country_name }}"
+          organization_name: "{{ organization_name }}"
+          email_address: "{{ email_address }}"
+          common_name: "{{ server_hostname }}"
+
+      - name: "Sign the CSR file as a CA to turn it into a certificate"
+        openssl_certificate:
+          path: "./certificates/{{ server_hostname }}.crt"
+          privatekey_path: "./certificates/{{ server_hostname }}_privkey.pem"
+          privatekey_passphrase: "{{ passphrase }}"
+          csr_path: "./certificates/{{ server_hostname }}.csr"
+          provider: selfsigned
